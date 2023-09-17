@@ -31,6 +31,9 @@ const handler = NextAuth({
 
 
     },
+    jwt: {
+        secret: process.env.JWT_SECRET || ''
+    }
 })
 
 
