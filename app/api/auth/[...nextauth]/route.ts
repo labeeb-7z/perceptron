@@ -6,8 +6,8 @@ const handler = NextAuth({
     session: { strategy: "jwt" },   
     providers: [
         TwitterProvider({
-            clientId: 'aUd3N3YwN3BjWXFNYVB0dGhrU3I6MTpjaQ',
-            clientSecret: '8Ltgjvm4OAO77Sufg0pa-8H7L3YvDv56xrK9Sz_6aUEnScrtQj',
+            clientId: process.env.TWITTER_CLIENT_ID || '',
+            clientSecret: process.env.TWITTER_CLIENT_SECRET || '',
             version: '2.0'
         })
     ],
