@@ -1,9 +1,8 @@
 import NextAuth from "next-auth"
-import type { AuthOptions } from "next-auth"
 import TwitterProvider from "next-auth/providers/twitter";
 
 
-export const authOptions: AuthOptions = {
+const handler = NextAuth({ 
   providers: [
     TwitterProvider({
         clientId: '',
@@ -11,8 +10,7 @@ export const authOptions: AuthOptions = {
       })
   ],
   session: { strategy: "jwt" }
-}
+})
 
-const handler = NextAuth(authOptions)
 
 export { handler as GET, handler as POST }
