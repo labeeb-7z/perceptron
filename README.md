@@ -1,6 +1,6 @@
 <h1 align="center">
-  <a href="https://github.com/CommunityOfCoders/Inheritance-2022">
-    <img src="https://hackmd.io/_uploads/rkb0Xhuya.png" alt="CoC Inheritance 2022" width="300" height="200">
+  <a href="#">
+    <img src="https://hackmd-prod-images.s3-ap-northeast-1.amazonaws.com/uploads/upload_6315995e35cc903fc26dbbdabe0575bb.png?AWSAccessKeyId=AKIA3XSAAW6AWSKNINWO&Expires=1695234397&Signature=%2FZkJ8bTruziWkvW6irH3F8D6k%2F0%3D"  width="300" height="200">
   </a>
   <br>
   Perceptron
