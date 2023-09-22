@@ -1,7 +1,25 @@
 import Image from 'next/image'
-import React from 'react'
-
+import React, { useEffect } from 'react'
+import { signIn, signOut, useSession } from "next-auth/react"
 const Navbar = () => {
+    const { data: session, status } = useSession();
+    const [socialMedia, setSocialMedia] = React.useState('tw');
+    useEffect(() => {
+        const url = window.location.href;
+        const urlSplit = url.split('?=')[1];
+        if(urlSplit){
+          if(urlSplit === 'tw'){
+            setSocialMedia('tw');
+          }
+  
+          if(urlSplit === 'yt'){
+            setSocialMedia('yt');
+          }
+          if(urlSplit === 'ws'){
+            setSocialMedia('ws');
+          }
+        } 
+      }, [])
   return (
     <>
         <header class="antialiased border-b-[2px]">
@@ -19,7 +37,7 @@ const Navbar = () => {
                 <Image src="https://flowbite.s3.amazonaws.com/logo.svg" class="mr-3 h-8" alt="FlowBite Logo" />
                 <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Flowbite</span>
               </a> */}
-              <form action="#" method="GET" class="hidden lg:block lg:pl-2">
+              {/* <form action="#" method="GET" class="hidden lg:block lg:pl-2">
                 <label for="topbar-search" class="sr-only">Search</label>
                 <div class="relative mt-1 lg:w-[15rem]">
                   <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
@@ -27,20 +45,117 @@ const Navbar = () => {
                   </div>
                   <input type="text" name="text" id="topbar-search" class="bg-[#F5F5F5] outline-[#F9AA00] text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-9 p-2.5" placeholder="Search"/>
                 </div>
-              </form>
+              </form> */}
+              {
+                socialMedia === 'tw' ? (
+                    <div className='flex'>
+                        <svg className="h-7 w-7 mt-0 mr-2" viewBox="328 355 335 276" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="
+                                        M 630, 425
+                                        A 195, 195 0 0 1 331, 600
+                                        A 142, 142 0 0 0 428, 570
+                                        A  70,  70 0 0 1 370, 523
+                                        A  70,  70 0 0 0 401, 521
+                                        A  70,  70 0 0 1 344, 455
+                                        A  70,  70 0 0 0 372, 460
+                                        A  70,  70 0 0 1 354, 370
+                                        A 195, 195 0 0 0 495, 442
+                                        A  67,  67 0 0 1 611, 380
+                                        A 117, 117 0 0 0 654, 363
+                                        A  65,  65 0 0 1 623, 401
+                                        A 117, 117 0 0 0 662, 390
+                                        A  65,  65 0 0 1 630, 425
+                                        Z"
+                                        fill="#3BA9EE"/>
+                        </svg>  
+                        <span class="self-center text-xl font-semibold whitespace-nowrap text-gray-800">Twitter Analytics</span> 
+                    </div>
+                ): socialMedia === 'yt' ? (
+                    <div className='flex'>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 mt-0 mr-2" viewBox="0 0 461.001 461.001">
+                            <g>
+                                <path fill='#F61C0D' d="M365.257,67.393H95.744C42.866,67.393,0,110.259,0,163.137v134.728   c0,52.878,42.866,95.744,95.744,95.744h269.513c52.878,0,95.744-42.866,95.744-95.744V163.137   C461.001,110.259,418.135,67.393,365.257,67.393z M300.506,237.056l-126.06,60.123c-3.359,1.602-7.239-0.847-7.239-4.568V168.607   c0-3.774,3.982-6.22,7.348-4.514l126.06,63.881C304.363,229.873,304.298,235.248,300.506,237.056z"/>
+                            </g>
+                        </svg>  
+                        <span class="self-center text-xl font-semibold whitespace-nowrap text-gray-800">Youtube Analytics</span> 
+                    </div>
+                ) : (
+                    <div className='flex'>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 mr-2 mt-0">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                        </svg>
+                        <span class="self-center text-xl font-semibold whitespace-nowrap text-gray-800">Word Search Analytics</span> 
+                    </div>
+                )
+              }
+              
             </div>
           <div class="flex items-center lg:order-2">
-              <button type="button" class="hidden sm:inline-flex items-center justify-center text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-xs px-3 py-1.5 mr-2"><svg aria-hidden="true" class="mr-1 -ml-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg> New Widget</button>
-              <button id="toggleSidebarMobileSearch" type="button" class="p-2 text-gray-500 rounded-lg lg:hidden hover:text-gray-900 hover:bg-gray-100">
+              {
+                socialMedia === 'tw' ? (
+                    <div className='mt-1 justify-center items-center'>
+                      {
+                        status === 'authenticated' ? (
+                          <>
+                            <div className="flex">
+                            <button type="button" className="flex mr-3 text-sm bg-gray-800 rounded-full md:mr-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600" id="user-menu-button" aria-expanded="false" data-dropdown-toggle="user-dropdown" data-dropdown-placement="bottom">
+                              <Image src={session.user?.image || ''} width={100} height={100} className="w-8 h-8 rounded-full"  alt="user photo"></Image>
+                            </button>
+                             {/* <p className="ml-3 mt-1 flex">
+                              {session.user?.name} 
+                            </p> */}
+                            <div className="flex justify-center items-center">
+                              <svg onClick={()=>{
+                                signOut();
+                              }} className="w-6 h-6 ml-2 hover:cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                            </div>
+                            </div>
+                          </>
+                        ) : status === 'loading' ? (
+                        <div className="flex justify-center items-center mt-0">
+                          <div role="status">
+                            <svg aria-hidden="true" className="w-7 h-7 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                                <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                            </svg>
+                            <span className="sr-only">Loading...</span>
+                        </div>
+                        </div>):(
+                          <button onClick={()=>{
+                            signIn();
+                          }} type="button" className="text-white bg-[#1da1f2] hover:bg-[#1da1f2]/90 focus:ring-4 focus:outline-none focus:ring-[#1da1f2]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#1da1f2]/55 mr-2 mb-2">
+                            <svg className="w-4 h-4 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 17">
+                              <path fill-rule="evenodd" d="M20 1.892a8.178 8.178 0 0 1-2.355.635 4.074 4.074 0 0 0 1.8-2.235 8.344 8.344 0 0 1-2.605.98A4.13 4.13 0 0 0 13.85 0a4.068 4.068 0 0 0-4.1 4.038 4 4 0 0 0 .105.919A11.705 11.705 0 0 1 1.4.734a4.006 4.006 0 0 0 1.268 5.392 4.165 4.165 0 0 1-1.859-.5v.05A4.057 4.057 0 0 0 4.1 9.635a4.19 4.19 0 0 1-1.856.07 4.108 4.108 0 0 0 3.831 2.807A8.36 8.36 0 0 1 0 14.184 11.732 11.732 0 0 0 6.291 16 11.502 11.502 0 0 0 17.964 4.5c0-.177 0-.35-.012-.523A8.143 8.143 0 0 0 20 1.892Z" clip-rule="evenodd"/>
+                            </svg>
+                            Connect Twitter
+                          </button>
+                        )
+                      }
+                </div>
+                ) : (
+                    // <button type="button" class="text-white bg-[#050708] hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-4 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30 mr-2 ">
+                    //     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mt-0 mr-2" viewBox="0 0 461.001 461.001">
+                    //         <g>
+                    //             <path fill='#FFFFFF' d="M365.257,67.393H95.744C42.866,67.393,0,110.259,0,163.137v134.728   c0,52.878,42.866,95.744,95.744,95.744h269.513c52.878,0,95.744-42.866,95.744-95.744V163.137   C461.001,110.259,418.135,67.393,365.257,67.393z M300.506,237.056l-126.06,60.123c-3.359,1.602-7.239-0.847-7.239-4.568V168.607   c0-3.774,3.982-6.22,7.348-4.514l126.06,63.881C304.363,229.873,304.298,235.248,300.506,237.056z"/>
+                    //         </g>
+                    //     </svg> 
+                    //     Connect Youtube
+                    // </button>
+                    <></>
+                )
+              }
+                
+              {/* <button type="button" class="hidden sm:inline-flex items-center justify-center text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-xs px-3 py-1.5 mr-2"><svg aria-hidden="true" class="mr-1 -ml-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg> New Widget</button> */}
+              {/* <button id="toggleSidebarMobileSearch" type="button" class="p-2 text-gray-500 rounded-lg lg:hidden hover:text-gray-900 hover:bg-gray-100">
                   <span class="sr-only">Search</span>
                     <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
                     </svg>
-              </button>
-              <button type="button" data-dropdown-toggle="notification-dropdown" class="p-2 mr-1 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 focus:ring-4 focus:ring-gray-300 ">
+              </button> */}
+              {/* <button type="button" data-dropdown-toggle="notification-dropdown" class="p-2 mr-1 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 focus:ring-4 focus:ring-gray-300 ">
                   <span class="sr-only">View notifications</span>
                   <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 14 20"><path d="M12.133 10.632v-1.8A5.406 5.406 0 0 0 7.979 3.57.946.946 0 0 0 8 3.464V1.1a1 1 0 0 0-2 0v2.364a.946.946 0 0 0 .021.106 5.406 5.406 0 0 0-4.154 5.262v1.8C1.867 13.018 0 13.614 0 14.807 0 15.4 0 16 .538 16h12.924C14 16 14 15.4 14 14.807c0-1.193-1.867-1.789-1.867-4.175ZM3.823 17a3.453 3.453 0 0 0 6.354 0H3.823Z"/></svg>
-              </button>
+              </button> */}
               <div class="hidden overflow-hidden z-50 my-4 max-w-sm text-base list-none bg-white rounded divide-y divide-gray-100 shadow-lg" id="notification-dropdown">
                   <div class="block py-2 px-4 text-base font-medium text-center text-gray-700 bg-gray-50">
                       Notifications
@@ -109,13 +224,13 @@ const Navbar = () => {
                       </div>
                   </a>
               </div>
-              <button type="button" data-dropdown-toggle="apps-dropdown" class="p-2 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600">
+              {/* <button type="button" data-dropdown-toggle="apps-dropdown" class="p-2 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600">
                   <span class="sr-only">View notifications</span>
                   <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 18">
                     <path d="M6.143 0H1.857A1.857 1.857 0 0 0 0 1.857v4.286C0 7.169.831 8 1.857 8h4.286A1.857 1.857 0 0 0 8 6.143V1.857A1.857 1.857 0 0 0 6.143 0Zm10 0h-4.286A1.857 1.857 0 0 0 10 1.857v4.286C10 7.169 10.831 8 11.857 8h4.286A1.857 1.857 0 0 0 18 6.143V1.857A1.857 1.857 0 0 0 16.143 0Zm-10 10H1.857A1.857 1.857 0 0 0 0 11.857v4.286C0 17.169.831 18 1.857 18h4.286A1.857 1.857 0 0 0 8 16.143v-4.286A1.857 1.857 0 0 0 6.143 10Zm10 0h-4.286A1.857 1.857 0 0 0 10 11.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 18 16.143v-4.286A1.857 1.857 0 0 0 16.143 10Z"/>
                   </svg>              
-                </button>
-              <div class="hidden overflow-hidden z-50 my-4 max-w-sm text-base list-none bg-white rounded divide-y divide-gray-100 shadow-lg dark:bg-gray-700 dark:divide-gray-600" id="apps-dropdown">
+                </button> */}
+              {/* <div class="hidden overflow-hidden z-50 my-4 max-w-sm text-base list-none bg-white rounded divide-y divide-gray-100 shadow-lg dark:bg-gray-700 dark:divide-gray-600" id="apps-dropdown">
                   <div class="block py-2 px-4 text-base font-medium text-center text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                       Apps
                   </div>
@@ -157,10 +272,10 @@ const Navbar = () => {
                       <div class="text-sm font-medium text-gray-900 dark:text-white">Logout</div>
                   </a>
                   </div>
-              </div>
-              <button type="button" class="flex mx-3 text-sm bg-gray-800 rounded-full md:mr-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600" id="user-menu-button" aria-expanded="false" data-dropdown-toggle="dropdown">
+              </div> */}
+              {/* <button type="button" class="flex mx-3 text-sm bg-gray-800 rounded-full md:mr-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600" id="user-menu-button" aria-expanded="false" data-dropdown-toggle="dropdown">
                   <span class="sr-only">Open user menu</span>
-              </button>
+              </button> */}
               <div class="hidden z-50 my-4 w-56 text-base list-none bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600" id="dropdown">
                   <div class="py-3 px-4">
                       <span class="block text-sm font-semibold text-gray-900 dark:text-white">Neil sims</span>

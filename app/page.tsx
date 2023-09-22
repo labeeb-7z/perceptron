@@ -3,11 +3,140 @@ import { signIn, signOut, useSession } from "next-auth/react"
 import Sidebar from "../components/Sidebar"
 import Navbar from "../components/Navbar"
 import Image from "next/image"
+import axios from "axios"
+import { useEffect, useState } from "react"
+import Analytics from "../components/Analytics"
+import YtAnalytics from "../components/YtAnalytics"
+import { useRouter } from "next/navigation"
 
 export default function Home() {
-  const { data: session, status } = useSession()
+  const { data: session, status }: any = useSession();
+  const [tweet_id, setTweet_id] = useState(null);
+  const [tweets, setTweets] = useState([]);
+  const [tweetAnalytics, setTweetAnalytics] = useState([]);
+  const [profile, setProfile] = useState<any>(null);
 
-    console.log(session);
+  const getSelectedTweet: any = () => {
+    const selectedTweet = tweets?.filter((tweet: any)=> {
+      return tweet?.tweet_id === tweet_id
+    })
+    const selectedAnalytics = tweetAnalytics?.filter((tweet: any)=> {
+      return tweet?.tweet_id === tweet_id
+    })
+    console.log({
+      selectedTweet,
+      selectedAnalytics
+    });
+    
+    return {
+      selectedTweet,
+      selectedAnalytics
+    };
+  }
+
+  async function registerTwitter(userId: string) {
+    if(!userId || userId === ''){
+      console.error('no user id');
+      return;
+    };
+    try {
+      const res = await axios.post('http://localhost:4000/api/v1/registerTwitter', {
+        user_id: '828894693463359489',
+      });
+      console.log(res.data)
+      setProfile(res.data?.profile);
+      setTweets(res.data?.profile?.tweets || []);
+      setTweetAnalytics(res?.data?.profile?.tweet_analysis || []);
+    } catch (error: any) {
+      if(error.response?.status === 409){
+        console.log(error.response.data)
+      }
+    }
+  }
+
+  console.log(tweetAnalytics);
+  
+
+    useEffect(() => {
+      if(status === 'authenticated'){
+        registerTwitter(session.user?.id);
+      }
+    }, [status])
+    
+
+    const formatDate: any = (dateStr: string): string => {
+      const options: any = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+      return new Date(dateStr).toLocaleDateString(undefined, options);
+    };
+
+
+    // yt
+    const [video_id, setVideo_id] = useState(null);
+    const [videos, setVideos] = useState([]);
+    const [videoAnalytics, setVideoAnalytics] = useState([]);
+    const [channel, setChannel] = useState<any>(null);
+
+    const getSelectedVideo: any = () => {
+      const selectedVideo = videos?.filter((video: any)=> {
+        return video?.id1?.videoId === video_id
+      })
+      
+      const selectedAnalytics = videoAnalytics?.filter((video: any)=> {
+        return video?.video_id === video_id
+      })
+      console.log({
+        selectedVideo,
+        selectedAnalytics
+      });
+      
+      return {
+        selectedVideo,
+        selectedAnalytics
+      };
+    }
+    
+
+    async function getYoutubeAnalytics() {
+      try {
+        const res = await axios.post('http://localhost:4000/api/v1/getAnalyticsfromChannelId', 
+          {
+            "channel_id":"UCY6N8zZhs2V7gNTUxPuKWoQ"
+          }
+        );
+        setVideos(res.data?.channel?.videos || []);
+        setVideoAnalytics(res.data?.channel?.video_analysis || []);
+      } catch (error: any) {
+        if(error?.response){
+          console.log(error.response?.data)
+        }else{
+          console.log(error);
+          
+        }
+      }
+    }
+
+
+    const [socialMedia, setSocialMedia] = useState('tw');
+    useEffect(() => {
+      const url = window.location.href;
+      const urlSplit = url.split('?=')[1];
+      if(urlSplit){
+        if(urlSplit === 'tw'){
+          setSocialMedia('tw');
+        }
+
+        if(urlSplit === 'yt'){
+          setSocialMedia('yt');
+          getYoutubeAnalytics();
+        }
+        if(urlSplit === 'ws'){
+          setSocialMedia('ws');
+        }
+      } 
+    }, [])
+
+    console.log(videos);
+    
     
     return (
       <>
@@ -15,90 +144,177 @@ export default function Home() {
             <Sidebar/>
             <div className='w-full h-[100vh] pl-[14rem]'>
                 <Navbar/>
-                <div className='flex flex-wrap items-center mt-5 ml-10'>
-                    <div className='h-[8rem] w-[15rem] border p-5 rounded-lg mx-5 my-5 justify-center items-center'>
-                      {
-                        status === 'authenticated' ? (
+               { socialMedia === 'tw' ? <section className="bg-white mt-5 flex justify-between dark:bg-gray-900">
+                    <div className="min-w-[35rem] px-4 ml-2 max-h-[100vh] overflow-y-scroll scroll rounded mr-3">
+                    {tweets && tweets.map((tweet: any) => {
+                        return(
                           <>
-                            <div className="flex">
-                            <button type="button" className="flex mr-3 text-sm bg-gray-800 rounded-full md:mr-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600" id="user-menu-button" aria-expanded="false" data-dropdown-toggle="user-dropdown" data-dropdown-placement="bottom">
-                              <Image src={session.user?.image || ''} width={100} height={100} className="w-8 h-8 rounded-full"  alt="user photo"></Image>
-                            </button>
-                             <p className="ml-3 mt-1 flex">
-                              {session.user?.name} 
-                              <svg className="h-5 w-5 mt-0 ml-3" viewBox="328 355 335 276" xmlns="http://www.w3.org/2000/svg">
-                                <path d="
-                                  M 630, 425
-                                  A 195, 195 0 0 1 331, 600
-                                  A 142, 142 0 0 0 428, 570
-                                  A  70,  70 0 0 1 370, 523
-                                  A  70,  70 0 0 0 401, 521
-                                  A  70,  70 0 0 1 344, 455
-                                  A  70,  70 0 0 0 372, 460
-                                  A  70,  70 0 0 1 354, 370
-                                  A 195, 195 0 0 0 495, 442
-                                  A  67,  67 0 0 1 611, 380
-                                  A 117, 117 0 0 0 654, 363
-                                  A  65,  65 0 0 1 623, 401
-                                  A 117, 117 0 0 0 662, 390
-                                  A  65,  65 0 0 1 630, 425
-                                  Z"
-                                  fill="#3BA9EE"/>
-                              </svg>
-                            </p>
-                            </div>
-                            <div className="flex justify-center items-center">
-                              <button role="button" className="focus:ring-2 focus:ring-offset-2 focus:ring-[#E37401] text-md font-semibold leading-none text-white focus:outline-none bg-[#E37401] border rounded hover:bg-[#E37401] hover:translate-y-[-2px] transition-all duration-200 py-4 w-full scale-75 mt-3">View analytics</button>
-                              <svg onClick={()=>{
-                                signOut();
-                              }} className="w-5 h-5 mt-2 hover:cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                            <div className={`p-5 mb-4 ${ tweet?.tweet_id === tweet_id ? 'border-[#f9aa00] border-2' : 'border-gray-100 border' } rounded-lg bg-gray-50  hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700`}>
+                                <time className="text-lg font-semibold text-gray-900 dark:text-white">{formatDate(tweet?.creation_date)}</time>
+                                <ol className="mt-3 divide-y divider-gray-200 dark:divide-gray-700">
+                                    <li>
+                                        <div className="items-center block p-3 sm:flex ">
+                                            <Image src={ profile?.profile_pic_url ||session.user?.image || ''} width={100} height={100} className="w-8 h-8 rounded-full mr-7"  alt="user photo"></Image>
+                                            <div className="text-gray-600 dark:text-gray-400 max-w-[27rem] pr-2">
+                                                <div className="text-base font-normal">{tweet?.text}</div>
+                                                <div className="mt-5 flex justify-between w-[25rem]">
+                                                <span className="inline-flex items-center text-xs font-normal text-gray-500 dark:text-gray-400">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 mr-2">
+                                                      <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                                                    </svg>
+                                                       {tweet?.favorite_count}
+                                                  </span> 
+                                                  <span className="inline-flex items-center text-xs font-normal text-gray-500 dark:text-gray-400">
+                                                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 mr-2">
+                                                      <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
+                                                    </svg>
+                                                       {tweet?.reply_count}
+                                                  </span> 
+                                                  <span className="inline-flex items-center text-xs font-normal text-gray-500 dark:text-gray-400">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-4 h-4 mr-2">
+                                                      <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+                                                    </svg>
+                                                       {tweet?.bookmark_count}
+                                                  </span> 
+                                                  <span onClick={()=>{
+                                                    setTweet_id(tweet?.tweet_id)
+                                                  }} className="inline-flex items-center text-xs font-normal hover:cursor-pointer rounded hover:bg-gray-50 py-2 px-2 text-gray-500 dark:text-gray-400">
+                                                    <svg className='h-[1rem] w-[1rem] mr-2' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 301112 333331" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd"><path d="M301110 291619c124 22886-18333 41521-41206 41644-1700 14-3415-82-5101-288-21227-3140-36776-21611-36256-43057V43342c-507-21474 15084-39944 36324-43057 22721-2660 43304 13602 45964 36324 192 1673 288 3346 274 5032v249977z" fill="#f9ab00"/><path d="M41288 250756c22804 0 41288 18484 41288 41288s-18484 41288-41288 41288S0 314848 0 292044s18484-41288 41288-41288zm108630-125126c-22913 1261-40685 20472-40150 43413v110892c0 30099 13246 48364 32649 52258 22393 4539 44209-9928 48748-32320 562-2743 836-5526 822-8323V167124c41-22886-18470-41467-41356-41507-233 0-480 0-713 14z" fill="#e37400"/></svg>
+                                                       {tweet?.tweet_id === tweet_id ? 'Viewing' : 'View analytics'}
+                                                  </span> 
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ol>
                             </div>
                           </>
-                        ) : status === 'loading' ? (
-                        <div className="flex justify-center items-center mt-5">
-                          <div role="status">
-                            <svg aria-hidden="true" className="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
-                                <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
-                            </svg>
-                            <span className="sr-only">Loading...</span>
-                        </div>
-                        </div>):(
-                          <button onClick={()=>{
-                            signIn();
-                          }} type="button" className="text-white bg-[#1da1f2] hover:bg-[#1da1f2]/90 focus:ring-4 focus:outline-none focus:ring-[#1da1f2]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#1da1f2]/55 mr-2 mb-2">
-                            <svg className="w-4 h-4 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 17">
-                              <path fill-rule="evenodd" d="M20 1.892a8.178 8.178 0 0 1-2.355.635 4.074 4.074 0 0 0 1.8-2.235 8.344 8.344 0 0 1-2.605.98A4.13 4.13 0 0 0 13.85 0a4.068 4.068 0 0 0-4.1 4.038 4 4 0 0 0 .105.919A11.705 11.705 0 0 1 1.4.734a4.006 4.006 0 0 0 1.268 5.392 4.165 4.165 0 0 1-1.859-.5v.05A4.057 4.057 0 0 0 4.1 9.635a4.19 4.19 0 0 1-1.856.07 4.108 4.108 0 0 0 3.831 2.807A8.36 8.36 0 0 1 0 14.184 11.732 11.732 0 0 0 6.291 16 11.502 11.502 0 0 0 17.964 4.5c0-.177 0-.35-.012-.523A8.143 8.143 0 0 0 20 1.892Z" clip-rule="evenodd"/>
-                            </svg>
-                            Connect Twitter
-                          </button>
                         )
-                      }
+                    })}
+                  </div>
+                  {
+                    tweet_id &&
+                    <div className="max-h-[100vh] w-[100%] mr-5 overflow-y-scroll scroll bg-gray-50 rounded border">
+                      <Analytics tweet={getSelectedTweet()}/>
                     </div>
-                    <div className='h-[8rem] w-[15rem] border p-5 rounded-lg mx-5 my-5 flex justify-center items-center'>
-                        {/* <PieChart/> */}
-                    </div>
-                    <div className='h-[8rem] w-[15rem] border p-5 rounded-lg mx-5 my-5 flex justify-center items-center'>
-                        {/* <BarChart/> */}
-                    </div>
-                    <div className='h-[8rem] w-[15rem] border p-5 rounded-lg mx-5 my-5 flex justify-center items-center'>
-                        {/* <AreaChart/> */}
-                    </div>
+                  }
+                </section> 
+                : socialMedia === 'yt' ?
+                <section className="bg-white mt-5 flex justify-between dark:bg-gray-900">
+                <div className="min-w-[42rem] px-4 ml-2 max-h-[100vh] overflow-y-scroll scroll rounded mr-3">
+                {videos && videos.map((video: any) => {
+                    return(
+                      <>
+                        <div className={`p-5 mb-4 rounded-lg bg-gray-50 ${ video?.id1?.videoId === video_id ? 'border-[#f9aa00] border-2' : 'border-gray-100 border' } hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700`}>
+                            <time className="text-lg font-semibold text-gray-900 dark:text-white">{formatDate(video?.snippet?.publishTime)}</time>
+                            <ol className="mt-3 divide-y divider-gray-200 dark:divide-gray-700">
+                                <li>
+                                    <div className="items-center block p-3 sm:flex ">
+                                        {/* <Image src={video?.snippet?.thumbnails?.default?.url} width={100} height={100} className="w-[6rem] h-[3rem] mr-4 mt-[-4rem]"  alt="user photo"></Image> */}
+                                        <iframe width="168" height="94" className="mr-5 rounded-md ml-[-0.75rem]" src={`https://www.youtube.com/embed/${ video?.id1?.videoId  || 'LYiTHzyP-Xw'}?si=x8z3RTs_SFQlPVzw`} title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+                                        <div className="text-gray-600 dark:text-gray-400 max-w-[27rem] pr-2">
+                                            <div className="text-base font-normal">{video?.snippet?.description}</div>
+                                            <div className="mt-5 flex justify-between w-[25rem]">
+                                            <span className="inline-flex items-center text-xs font-normal text-gray-500 dark:text-gray-400">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 mr-2">
+                                                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                                                </svg>
+                                                   {video?.favorite_count}
+                                              </span> 
+                                              <span className="inline-flex items-center text-xs font-normal text-gray-500 dark:text-gray-400">
+                                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 mr-2">
+                                                  <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
+                                                </svg>
+                                                   {video?.reply_count}
+                                              </span> 
+                                              <span className="inline-flex items-center text-xs font-normal text-gray-500 dark:text-gray-400">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-4 h-4 mr-2">
+                                                  <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+                                                </svg>
+                                                   {video?.bookmark_count}
+                                              </span> 
+                                              <span onClick={()=>{
+                                                setVideo_id(video?.id1?.videoId)
+                                              }} className="inline-flex items-center text-xs font-normal hover:cursor-pointer rounded hover:bg-gray-50 py-2 px-2 text-gray-500 dark:text-gray-400">
+                                                <svg className='h-[1rem] w-[1rem] mr-2' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 301112 333331" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd"><path d="M301110 291619c124 22886-18333 41521-41206 41644-1700 14-3415-82-5101-288-21227-3140-36776-21611-36256-43057V43342c-507-21474 15084-39944 36324-43057 22721-2660 43304 13602 45964 36324 192 1673 288 3346 274 5032v249977z" fill="#f9ab00"/><path d="M41288 250756c22804 0 41288 18484 41288 41288s-18484 41288-41288 41288S0 314848 0 292044s18484-41288 41288-41288zm108630-125126c-22913 1261-40685 20472-40150 43413v110892c0 30099 13246 48364 32649 52258 22393 4539 44209-9928 48748-32320 562-2743 836-5526 822-8323V167124c41-22886-18470-41467-41356-41507-233 0-480 0-713 14z" fill="#e37400"/></svg>
+                                                   {video?.id1?.videoId === video_id ? 'Viewing' : 'View analytics'}
+                                              </span> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ol>
+                        </div>
+                      </>
+                    )
+                })} 
+              </div>
+              {
+                video_id &&
+                <div className="max-h-[100vh] w-[100%] mr-5 overflow-y-scroll overflow-x-hidden scroll bg-gray-50 rounded border">
+                  <YtAnalytics video={getSelectedVideo()}/>
                 </div>
-                <div className='flex flex-wrap items-center ml-5'>
-                    <div className='h-[15rem] w-[30rem] border p-5 rounded-lg mx-10 my-10 flex justify-center items-center'>
-                        {/* <LineChart/> */}
-                    </div>
-                    <div className='h-[15rem] w-[30rem] border p-5 rounded-lg flex justify-center items-center'>
-                        {/* <PieChart/> */}
-                    </div>
-                    <div className='h-[15rem] w-[30rem] border p-5 rounded-lg mx-10 flex justify-center items-center'>
-                        {/* <BarChart/> */}
-                    </div>
-                    <div className='h-[15rem] w-[30rem] border p-5 rounded-lg flex justify-center items-center'>
-                        {/* <AreaChart/> */}
-                    </div>
+              } 
+                </section>
+                : 
+                <section className="bg-white mt-5 flex justify-between dark:bg-gray-900">
+                <div className="min-w-[42rem] px-4 ml-2 max-h-[100vh] overflow-y-scroll scroll rounded mr-3">
+                {videos && videos.map((video: any) => {
+                    return(
+                      <>
+                        <div className={`p-5 mb-4 rounded-lg bg-gray-50 ${ video?.id1?.videoId === video_id ? 'border-[#f9aa00] border-2' : 'border-gray-100 border' } hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700`}>
+                            <time className="text-lg font-semibold text-gray-900 dark:text-white">{formatDate(video?.snippet?.publishTime)}</time>
+                            <ol className="mt-3 divide-y divider-gray-200 dark:divide-gray-700">
+                                <li>
+                                    <div className="items-center block p-3 sm:flex ">
+                                        {/* <Image src={video?.snippet?.thumbnails?.default?.url} width={100} height={100} className="w-[6rem] h-[3rem] mr-4 mt-[-4rem]"  alt="user photo"></Image> */}
+                                        <iframe width="168" height="94" className="mr-5 rounded-md ml-[-0.75rem]" src={`https://www.youtube.com/embed/${ video?.id1?.videoId  || 'LYiTHzyP-Xw'}?si=x8z3RTs_SFQlPVzw`} title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+                                        <div className="text-gray-600 dark:text-gray-400 max-w-[27rem] pr-2">
+                                            <div className="text-base font-normal">{video?.snippet?.description}</div>
+                                            <div className="mt-5 flex justify-between w-[25rem]">
+                                            <span className="inline-flex items-center text-xs font-normal text-gray-500 dark:text-gray-400">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 mr-2">
+                                                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                                                </svg>
+                                                   {video?.favorite_count}
+                                              </span> 
+                                              <span className="inline-flex items-center text-xs font-normal text-gray-500 dark:text-gray-400">
+                                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 mr-2">
+                                                  <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
+                                                </svg>
+                                                   {video?.reply_count}
+                                              </span> 
+                                              <span className="inline-flex items-center text-xs font-normal text-gray-500 dark:text-gray-400">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-4 h-4 mr-2">
+                                                  <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+                                                </svg>
+                                                   {video?.bookmark_count}
+                                              </span> 
+                                              <span onClick={()=>{
+                                                setVideo_id(video?.id1?.videoId)
+                                              }} className="inline-flex items-center text-xs font-normal hover:cursor-pointer rounded hover:bg-gray-50 py-2 px-2 text-gray-500 dark:text-gray-400">
+                                                <svg className='h-[1rem] w-[1rem] mr-2' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 301112 333331" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd"><path d="M301110 291619c124 22886-18333 41521-41206 41644-1700 14-3415-82-5101-288-21227-3140-36776-21611-36256-43057V43342c-507-21474 15084-39944 36324-43057 22721-2660 43304 13602 45964 36324 192 1673 288 3346 274 5032v249977z" fill="#f9ab00"/><path d="M41288 250756c22804 0 41288 18484 41288 41288s-18484 41288-41288 41288S0 314848 0 292044s18484-41288 41288-41288zm108630-125126c-22913 1261-40685 20472-40150 43413v110892c0 30099 13246 48364 32649 52258 22393 4539 44209-9928 48748-32320 562-2743 836-5526 822-8323V167124c41-22886-18470-41467-41356-41507-233 0-480 0-713 14z" fill="#e37400"/></svg>
+                                                   {video?.id1?.videoId === video_id ? 'Viewing' : 'View analytics'}
+                                              </span> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ol>
+                        </div>
+                      </>
+                    )
+                })} 
+              </div>
+              {
+                video_id &&
+                <div className="max-h-[100vh] w-[100%] mr-5 overflow-y-scroll overflow-x-hidden scroll bg-gray-50 rounded border">
+                  <YtAnalytics video={getSelectedVideo()}/>
                 </div>
+              } 
+                </section>
+              }
             </div>
         </div>
       </>
