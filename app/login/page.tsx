@@ -1,6 +1,9 @@
+"use client"
+import { useRouter } from 'next/navigation'
 import React from 'react'
 
 const Login = () => {
+    const router = useRouter();
   return (
     <div>
 
@@ -32,7 +35,9 @@ const Login = () => {
                            </div>
                         </div>
                         <div className="mt-8">
-                            <button role="button" className="focus:ring-2 focus:ring-offset-2 focus:ring-[#E37401] text-md font-semibold leading-none text-white focus:outline-none bg-[#E37401] border rounded hover:bg-[#E37401] hover:translate-y-[-2px] transition-all duration-200 py-4 w-full">Login to my account</button>
+                            <button onClick={()=>{
+                                router.push('/')
+                            }} role="button" className="focus:ring-2 focus:ring-offset-2 focus:ring-[#E37401] text-md font-semibold leading-none text-white focus:outline-none bg-[#E37401] border rounded hover:bg-[#E37401] hover:translate-y-[-2px] transition-all duration-200 py-4 w-full">Login to my account</button>
                         </div>
                 </div>
             </div>

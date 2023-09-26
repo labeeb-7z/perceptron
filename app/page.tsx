@@ -62,10 +62,8 @@ export default function Home() {
   console.log(tweetAnalytics);
 
   useEffect(() => {
-    if (status === "authenticated") {
-      registerTwitter(session.user?.id);
-    }
-  }, [status]);
+      registerTwitter('kjbj');
+  }, []);
 
   const formatDate: any = (dateStr: string): string => {
     const options: any = {
